@@ -2,7 +2,7 @@ const path = require("path");
 const express = require("express");
 const app = express();
 
-const clientPath = path.join(__dirname, '../', 'client');
+const clientPath = path.join(__dirname, 'client');
 
 app.use(express.static(path.join(clientPath, 'build')));
 app.use(express.static("public"));
@@ -13,6 +13,7 @@ app.get("/", (req, res) => {
 });
 
 // start express server on port 5000
-app.listen(80, () => {
-    console.log("server started on port 3000");
+const port = 8080
+app.listen(port, () => {
+    console.log("server started on port " + port);
 });
