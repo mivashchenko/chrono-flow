@@ -1,0 +1,10 @@
+@import "styles/variables.scss";
+
+body {
+  background: $palette-1 !important;
+}
+
+.app-container {
+  max-width: 1024px;
+  margin: 0 auto;
+}

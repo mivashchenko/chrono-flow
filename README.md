@@ -1,2 +1,4 @@
-# chrono-flow
-It is my home project.
+
+```docker-compose build```
+
+```docker-compose up```
