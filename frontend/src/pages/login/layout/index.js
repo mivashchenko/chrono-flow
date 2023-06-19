@@ -4,8 +4,8 @@ import './style.scss'
 export const LoginPageLayout = ({children}) => {
 
     return (
-        <div className={'login-page-container'}>
-            <div className={'login-page-content'}>
+        <div className={'sign-up-page-container'}>
+            <div className={'sign-up-page-content'}>
                 {children}
             </div>
         </div>

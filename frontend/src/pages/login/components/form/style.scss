@@ -1,0 +1,29 @@
+@import "~styles/variables.scss";
+
+.sign-up-form-container {
+  background: $white;
+  padding: $spacing-24px $spacing-24px $spacing-64px $spacing-24px;
+  border-radius: $border-radius-4px;
+  box-shadow: $shadow-1;
+}
+
+.sign-up-form-content {
+  padding: $spacing-96px $spacing-48px ;
+  background: $black;
+}
+
+.sign-up-form {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: flex-end;
+
+  &-label {
+    color: $white;
+    margin-bottom: $spacing-8px;
+  }
+
+  &-input {
+    margin-left: $spacing-8px;
+  }
+}

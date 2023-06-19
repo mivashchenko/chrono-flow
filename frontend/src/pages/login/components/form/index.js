@@ -1,53 +1,59 @@
-import React from "react";
-import {Button, Checkbox, Form, Input} from "antd";
+import React, {useState} from "react";
+import './style.scss';
 
 export const LoginForm = () => {
-    const onFinish = (values) => {
-        console.log('Success:', values);
-    };
 
-    const onFinishFailed = (errorInfo) => {
-        console.log('Failed:', errorInfo);
-    };
+    const [authData, setAuthData] = useState({});
+
+    const updateAuthData = (e) => {
+        setAuthData({
+            ...authData,
+            [e.target.name]: e.target.value
+        })
+    }
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        fetch('http://localhost:5555/auth/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                email: authData.email,
+                password: authData.password,
+            }),
+        }).then((res) => {
+            if (res.status === 422) {
+                throw new Error('Validation failed.');
+            }
+            if (res.status !== 200 && res.status !== 201) {
+                console.log('Error!');
+                throw new Error('Could not authenticate you!');
+            }
+            return res.json();
+        }).then((resData) => {
+            localStorage.setItem('token', resData.token);
+            localStorage.setItem('userId', resData.userId);
+
+        });
+    }
+
     return (
-        <div className={'login-form-container'}>
-            <div className={'login-form-content'}>
-                <Form
-                    name="basic"
-                    labelCol={{span: 8}}
-                    wrapperCol={{span: 16}}
-                    style={{maxWidth: 600}}
-                    initialValues={{remember: true}}
-                    onFinish={onFinish}
-                    onFinishFailed={onFinishFailed}
-                    autoComplete="off"
-                >
-                    <Form.Item
-                        label="Username"
-                        name="username"
-                        rules={[{required: true, message: 'Please input your username!'}]}
-                    >
-                        <Input/>
-                    </Form.Item>
+        <div className={'sign-up-form-container'}>
+            <div className={'sign-up-form-content'}>
+                <form onSubmit={handleSubmit} className={'sign-up-form'}>
 
-                    <Form.Item
-                        label="Password"
-                        name="password"
-                        rules={[{required: true, message: 'Please input your password!'}]}
-                    >
-                        <Input.Password/>
-                    </Form.Item>
+                    <label className={'sign-up-form-label'}> Email:
+                        <input className={'sign-up-form-input'} type="email" name="email" onChange={updateAuthData}/>
+                    </label>
 
-                    <Form.Item name="remember" valuePropName="checked" wrapperCol={{offset: 8, span: 16}}>
-                        <Checkbox>Remember me</Checkbox>
-                    </Form.Item>
+                    <label className={'sign-up-form-label'}> Password:
+                        <input className={'sign-up-form-input'} type="password" name="password"
+                               onChange={updateAuthData}/>
+                    </label>
 
-                    <Form.Item wrapperCol={{offset: 8, span: 16}}>
-                        <Button type="primary" htmlType="submit">
-                            Submit
-                        </Button>
-                    </Form.Item>
-                </Form>
+                    <button>Login</button>
+                </form>
             </div>
         </div>
     )
