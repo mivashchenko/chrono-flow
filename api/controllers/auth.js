@@ -74,6 +74,10 @@ exports.login = (req, res, next) => {
 }
 
 exports.user = (req, res, next) => {
+    console.log(req)
+    if(false) {
+
+    }
     const user = req.user;
     res.json(user);
 }

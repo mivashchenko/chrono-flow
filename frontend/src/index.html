@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8">
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <style>
+        body { margin:0;position:fixed;top:0;right:0;bottom:0;left:0; }
+        .inner { stroke: black; stroke-width: 2; }
+        line { stroke: red; stroke-width: 2; }
+        text { text-anchor: middle; font-size: 20px; font-family: sans-serif; font-weight: bold; }
+        .special {
+            fill: steelblue;
+        }
+
+        .DS {
+            fill: green;
+        }
+
+        .N {
+            fill: purple;
+        }
+
+        .S {
+            fill: pink;
+        }
+
+        .march {
+            fill: #f2f0dd;
+            stroke: #f2f0dd;
+        }
+        .april {
+            fill: #d8d29a;
+            stroke: #d8d29a;
+        }
+        .may {
+            fill: #aca243;
+            stroke: #d8d29a;
+        }
+
+        .june {
+            fill: #9bce9b;
+            stroke: #9bce9b;
+        }
+        .july {
+            fill: #4ea24e;
+            stroke: #4ea24e;
+        }
+        .august {
+            fill: #316731;
+            stroke: #316731;
+        }
+
+        .september {
+            fill: #dba498;
+            stroke: #dba498;
+        }
+        .october {
+            fill: #c8715d;
+            stroke: #c8715d;
+        }
+        .november {
+            fill: #974634;
+            stroke: #974634;
+        }
+
+        .december {
+            fill: #6bdaff;
+            stroke: #6bdaff;
+        }
+        .january {
+            fill: #00bfff;
+            stroke: #00bfff;
+        }
+        .february {
+            fill: #005b7a;
+            stroke: #005b7a;
+        }
+
+        .week {
+            fill-opacity: 0.1;
+        }
+
+        .day {
+            fill-opacity: 0.3;
+            stroke: #adadad;
+        }
+
+        .monthText {
+            fill: white;
+            font-size: 20px;
+            stroke: #3d3d3d;
+            stroke-width: 1px;
+            text-transform: capitalize;
+        }
+
+        text.middle {
+            font-size: 120px;
+            fill: #d3d3d3;
+            stroke: #202020;
+        }
+    </style>
+</head>
+
+<body>
+<script>
+    var data = [
+        { date: new Date().toString(), project: 'special', special: true},
+        { date: '2017-04-21', project: 'DS'},
+        { date: '2017-05-01', project: 'DS'},
+        { date: '2017-06-01', project: 'N'},
+        { date: '2017-08-01', project: 'N'},
+        { date: '2017-05-01', project: 'N'},
+        { date: '2017-05-31', project: 'N'},
+        { date: '2017-07-01', project: 'N'},
+        { date: '2017-06-01', project: 'S'},
+    ];
+
+    Date.prototype.isLeapYear = function() {
+        var year = this.getFullYear();
+        if((year & 3) != 0) return false;
+        return ((year % 100) != 0 || (year % 400) == 0);
+    };
+
+    // Get Day of Year
+    Date.prototype.getDOY = function() {
+        var dayCount = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
+        var mn = this.getMonth();
+        var dn = this.getDate();
+        var dayOfYear = dayCount[mn] + dn;
+        if(mn > 1 && this.isLeapYear()) dayOfYear++;
+        return dayOfYear;
+    };
+
+    function doyToDegrees(doy) {
+        return doy / 366 * 360;
+    }
+
+    function DegToRadians(degrees) {
+        return degrees * Math.PI / 180 - Math.PI / 2;
+    }
+
+    var arcPosition = 200;
+
+    var width = 800;
+    var height = 800;
+
+    var svg = d3.select("body").append("svg")
+        .attr("width", width)
+        .attr("height", height)
+
+    function addArch(arc, className, classNameAsId) {
+        const g = svg.append('g');
+        const path = g.append('path')
+            .attr('class', className)
+            .attr('d', arc)
+            .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+        if (classNameAsId) {
+            path.attr('id', className.split(' ')[0]);
+        }
+    }
+
+    function drawArc(start, end, innerPosition, outerPosition, className, classNameAsId) {
+        var arc = d3.arc()
+            .innerRadius(arcPosition + innerPosition)
+            .outerRadius(arcPosition + outerPosition)
+            .startAngle(DegToRadians(doyToDegrees(start)) + Math.PI / 2)
+            .endAngle(DegToRadians(doyToDegrees(end)) + Math.PI / 2)
+
+        addArch(arc, className, classNameAsId);
+    }
+
+    let seasons = [
+        { className: 'march', start: '2017-03-01', end: '2017-04-01' },
+        { className: 'april', start: '2017-04-01', end: '2017-05-01' },
+        { className: 'may', start: '2017-05-01', end: '2017-06-01' },
+        { className: 'june', start: '2017-06-01', end: '2017-07-01' },
+        { className: 'july', start: '2017-07-01', end: '2017-08-01' },
+        { className: 'august', start: '2017-08-01', end: '2017-09-01' },
+        { className: 'september', start: '2017-09-01', end: '2017-10-01' },
+        { className: 'october', start: '2017-10-01', end: '2017-11-01' },
+        { className: 'november', start: '2017-11-01', end: '2017-12-01' },
+        { className: 'december', start: '2017-12-01', end: '2017-12-31' },
+        { className: 'january', start: '2017-01-01', end: '2017-02-01' },
+        { className: 'february', start: '2017-02-01', end: '2017-03-01' },
+    ];
+
+    seasons = seasons.map(d => ({
+        className: d.className,
+        start: new Date(d.start).getDOY(),
+        end: new Date(d.end).getDOY(),
+    }));
+
+    let days = [];
+    let weeks = []
+    for(let i = 1; i <= 366; i++) {
+        const season = seasons.find(d => {
+            return i >= d.start && i <= d.end + 1;
+        });
+        const dayClassName = season && season.className;
+
+        days[i-1] = {
+            data: i,
+            className: `${dayClassName} day`  ,
+        };
+
+        if (i%7 == 1) {
+            const season = seasons.find(d => {
+                return i >= d.start && i <= d.end + 1;
+            });
+            const weekClassName = season && season.className;
+
+            weeks[weeks.length] = {
+                data: i,
+                className: `${weekClassName} week`  ,
+            };
+        }
+    }
+
+    days.forEach((d) => drawArc(d.data, d.data+1, 100, 150, d.className));
+    weeks.forEach((d) => drawArc(d.data, d.data+7, 20, 100, d.className));
+    seasons.forEach((d) => drawArc(
+        d.start + (d.className === 'january' ? -1 : 0),
+        d.end + (d.className === 'december' ? 1 : 0),
+        -10,
+        20,
+        `${d.className} season`,
+        true));
+
+    data.forEach((d) => {
+        const startDate = new Date(d.date);
+        const endDate = new Date(startDate.getTime());
+        endDate.setDate(startDate.getDate() + 1);
+
+        drawArc(
+            startDate.getDOY(),
+            endDate.getDOY(),
+            100,
+            180 + (d.special ? 30 : 0),
+            d.project
+        )});
+
+    svg.selectAll('.monthText')
+        .data(seasons)
+        .enter()
+        .append("text")
+        .attr("class", "monthText")
+        .attr("x", 58)   //Move the text from the start angle of the arc
+        .attr("dy", '1.1em') //Move the text down
+        .append("textPath")
+        .attr("xlink:href", d => `#${d.className}`)
+        .text(d => d.className.slice(0,3));
+
+    svg.append('text')
+        .classed('middle', true)
+        .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")")
+        .attr("dy", "0.33em")
+        .text('2017')
+
+</script>
+</body>

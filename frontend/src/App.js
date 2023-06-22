@@ -1,9 +1,8 @@
 import React, {useEffect} from "react";
 import {
-    BrowserRouter,
-    Routes,
     Route,
-    useNavigate, createBrowserRouter, createRoutesFromElements,
+ createBrowserRouter,
+    createRoutesFromElements,
     defer,
 } from "react-router-dom";
 import './App.scss';
@@ -15,6 +14,7 @@ import {ProtectedRoute} from "./components/router/protectedRoute";
 import {HomeLayout} from "./components/layouts/homeLayout";
 import {ProtectedLayout} from "./components/layouts/protectedLayout";
 import {AuthLayout} from "./components/layouts/authLayout";
+import {RoundCalendarPage} from "./pages/calendar";
 
 const getUserData = () => {
     const token = localStorage.getItem('token');
@@ -25,7 +25,13 @@ const getUserData = () => {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             }
-        }).then(res => res.json())
+        }).then(res => {
+        if(res.status === 500) {
+            window.localStorage.removeItem('user');
+            return null;
+        }
+        return res.json();
+    })
 };
 
 export const router = createBrowserRouter(
@@ -40,6 +46,7 @@ export const router = createBrowserRouter(
             <Route path="/dashboard" element={<ProtectedLayout/>}>
                 <Route path="profile" element={<div>Profile</div>}/>
                 <Route path="settings" element={<div>Settings</div>}/>
+                <Route path="calendar" element={<RoundCalendarPage/>}/>
             </Route>
         </Route>
     )

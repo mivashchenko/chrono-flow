@@ -7,8 +7,6 @@ export const AuthLayout = () => {
 
     const { userPromise } = useLoaderData();
 
-    const { login } = useAuth();
-
     return (
         <Suspense fallback={<div>Progress...</div>}>
             <Await

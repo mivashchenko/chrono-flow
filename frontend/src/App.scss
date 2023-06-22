@@ -1,6 +1,11 @@
 @import "styles/variables.scss";
 
+* {
+  font-family: monospace;
+}
+
 body {
+  min-height: 100vh;
   background: $palette-1 !important;
 }
 
