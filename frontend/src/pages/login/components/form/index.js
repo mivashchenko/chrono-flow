@@ -1,9 +1,11 @@
 import React, {useState} from "react";
 import './style.scss';
+import {useAuth} from "../../../../authProvider";
 
 export const LoginForm = () => {
 
     const [authData, setAuthData] = useState({});
+    const {login} = useAuth();
 
     const updateAuthData = (e) => {
         setAuthData({
@@ -30,11 +32,25 @@ export const LoginForm = () => {
                 console.log('Error!');
                 throw new Error('Could not authenticate you!');
             }
+
             return res.json();
         }).then((resData) => {
-            localStorage.setItem('token', resData.token);
+            const token = resData.token;
+            localStorage.setItem('token', token);
             localStorage.setItem('userId', resData.userId);
-
+            fetch('http://localhost:5555/auth/user',
+                {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    }
+                }).then((res) => res.json()).then(userData => {
+                login(userData);
+            }).catch(err => {
+                console.log(err);
+                throw new Error('Something went wrong!');
+            });
         });
     }
 

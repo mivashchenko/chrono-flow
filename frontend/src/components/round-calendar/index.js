@@ -1,52 +1,27 @@
 import './style.scss';
+import {
+    CALENDAR_RADIUS,
+    DEG_PER_MONTH,
+    LETTERS_IN_A_MONTH,
+    LETTERS_OFFSET_DEG,
+    MONTHS,
+    MONTHS_COUNT,
+    TOTAL_DEG
+} from "./constants";
+import {degToRad, describeArc} from "./utils";
+import moment from "moment";
 
 
-const degToRad = (deg) => {
-    return deg * Math.PI / 180;
-}
-
-const polarToCartesian = (centerX, centerY, radius, angleInDegrees) => {
-    const angleInRadians = (angleInDegrees - 90) * Math.PI / 180.0;
-
-    return {
-        x: centerX + (radius * Math.cos(angleInRadians)),
-        y: centerY + (radius * Math.sin(angleInRadians))
-    };
-}
-
-const describeArc = (x, y, radius, startAngle, endAngle) => {
-
-    const start = polarToCartesian(x, y, radius, endAngle);
-    const end = polarToCartesian(x, y, radius, startAngle);
-
-    const largeArcFlag = endAngle - startAngle <= 180 ? "0" : "1";
-
-    const d = [
-        "M", start.x, start.y,
-        "A", radius, radius, 0, largeArcFlag, 0, end.x, end.y
-    ].join(" ");
-
-    return d;
-}
-
-const LETTERS_OFFSET_DEG = 3;
-
-const TOTAL_DEG = 360;
-
-const MONTHS = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august',
-    'september', 'october', 'november', 'december'];
-const MONTHS_COUNT = 12;
 export const RoundCalendar = () => {
-
-    const degPerMonth = TOTAL_DEG / MONTHS_COUNT - 2;
-
-    const lettersInAMonth = 14;
 
     const renderLetterLine = (letter, degStep, letterMoveX, isReversed) => {
         const transformStyle = `rotate(${degStep}deg) translate(0, ${letterMoveX}px)`;
-        return <div className={'round-calendar-line'}
-                    style={{transform: transformStyle}}>
-            <div className={`round-calendar-line-month-letter ${isReversed ? 'reversed' : ''}`}>
+        return <div className={'round-calendar-month-letter-line'}
+                    style={{
+                        transform: transformStyle,
+                        height: `${CALENDAR_RADIUS}px`,
+                    }}>
+            <div className={`round-calendar-month-letter-line__letter ${isReversed ? 'reversed' : ''}`}>
                 {letter}
             </div>
         </div>
@@ -54,10 +29,10 @@ export const RoundCalendar = () => {
     const renderMonthLetters = () => {
         return MONTHS.map((month, monthIndex) => {
                 {
-                    const isReversed = 3 <monthIndex && monthIndex < 9;
+                    const isReversed = 3 < monthIndex && monthIndex < 9;
                     const monthLetters = isReversed ? month.split('').reverse() : month.split('');
                     return monthLetters.map((letter, letterIdx) => {
-                        const degStep = (monthIndex) * degPerMonth + ((letterIdx) * degPerMonth / lettersInAMonth) + LETTERS_OFFSET_DEG;
+                        const degStep = (monthIndex) * DEG_PER_MONTH + ((letterIdx) * DEG_PER_MONTH / LETTERS_IN_A_MONTH) + LETTERS_OFFSET_DEG;
                         const isOdd = monthIndex % 2 === 0;
                         const move = isOdd ? 0 : -15;
                         return renderLetterLine(letter, degStep, move, isReversed)
@@ -70,11 +45,13 @@ export const RoundCalendar = () => {
 
     const renderMonthUnderlines = () => {
         const lines = [];
+        const shift = 15;
+
         for (let i = 0; i < MONTHS_COUNT; i++) {
             const isOdd = i % 2 === 0;
-            const move = isOdd ? 0 : 15;
+            const move = isOdd ? shift : 0;
             lines.push(<path
-                d={`${describeArc(400, 400, 372 + move, i * degPerMonth, i * degPerMonth + degPerMonth)}`}
+                d={`${describeArc(CALENDAR_RADIUS / 2, CALENDAR_RADIUS / 2, CALENDAR_RADIUS / 2 - move - shift, i * DEG_PER_MONTH, i * DEG_PER_MONTH + DEG_PER_MONTH)}`}
                 fill="none"
                 stroke="#aca89b"
                 strokeWidth="1"/>)
@@ -85,27 +62,27 @@ export const RoundCalendar = () => {
     const renderBlueLine = (radius) => {
         return <>
             <path
-            d={`${describeArc(400, 400, radius , 0, degPerMonth * (MONTHS_COUNT))}`}
-            fill="none"
-            stroke="#b8dad4"
-            strokeDasharray={`${degToRad(degPerMonth) * radius}`}
-            strokeWidth="30"
-            strokeLinecap="round"
-            />
-            <path
-                d={`${describeArc(400, 400, radius , 0, 10)}`}
+                d={`${describeArc(CALENDAR_RADIUS / 2, CALENDAR_RADIUS / 2, radius, 0, DEG_PER_MONTH * (MONTHS_COUNT))}`}
                 fill="none"
-                stroke="#d6e7df"
-                strokeDashoffset={`${degToRad(degPerMonth) * radius}`}
+                stroke="#b8dad4"
+                strokeDasharray={`${degToRad(DEG_PER_MONTH) * radius}`}
                 strokeWidth="30"
                 strokeLinecap="round"
             />
             <path
-                d={`${describeArc(400, 400, radius , 0, degPerMonth * (MONTHS_COUNT))}`}
+                d={`${describeArc(CALENDAR_RADIUS / 2, CALENDAR_RADIUS / 2, radius, 0, 10)}`}
                 fill="none"
                 stroke="#d6e7df"
-                strokeDashoffset={`${degToRad(degPerMonth) * radius}`}
-                strokeDasharray={`${degToRad(degPerMonth) * radius}`}
+                strokeDashoffset={`${degToRad(DEG_PER_MONTH) * radius}`}
+                strokeWidth="30"
+                strokeLinecap="round"
+            />
+            <path
+                d={`${describeArc(CALENDAR_RADIUS / 2, CALENDAR_RADIUS / 2, radius, 0, DEG_PER_MONTH * (MONTHS_COUNT))}`}
+                fill="none"
+                stroke="#d6e7df"
+                strokeDashoffset={`${degToRad(DEG_PER_MONTH) * radius}`}
+                strokeDasharray={`${degToRad(DEG_PER_MONTH) * radius}`}
                 strokeWidth="30"
                 // strokeLinecap="round"
             />
@@ -113,24 +90,71 @@ export const RoundCalendar = () => {
     }
 
     const renderSvgBackground = () => {
-        return <svg width="800" height="800">
+
+        const radius1 = CALENDAR_RADIUS * 0.4;
+        const radius2 = CALENDAR_RADIUS * 0.36;
+        const radius3 = CALENDAR_RADIUS * 0.32;
+        const radius4 = CALENDAR_RADIUS * 0.28;
+
+        return <svg width={CALENDAR_RADIUS} height={CALENDAR_RADIUS}>
             {renderMonthUnderlines()}
-            {renderBlueLine(320)}
-            {renderBlueLine(280)}
-            {renderBlueLine(240)}
-            {renderBlueLine(200)}
+            {renderBlueLine(radius1)}
+            {renderBlueLine(radius2)}
+            {renderBlueLine(radius3)}
+            {renderBlueLine(radius4)}
         </svg>;
     }
 
+
+    const renderMonthDays = () => {
+        const days = [];
+        for (let i = 0; i < MONTHS_COUNT; i++) {
+            // const isOdd = false;
+            const isOdd = i % 2 === 0;
+            const move = isOdd ? 0 : -15;
+            const monthDays = [];
+            const daysCount = moment().month( i ).daysInMonth();
+            for (let j = 0; j < daysCount; j++) {
+                const degStep = (i) * DEG_PER_MONTH + ((j) * DEG_PER_MONTH / daysCount);
+                console.log((degToRad(360/365) * (CALENDAR_RADIUS/2 * 0.9)))
+                const dayDeg = degStep + j * (DEG_PER_MONTH / daysCount);
+                const dayMove = isOdd ? 0 : -15;
+                const dayRadius = move + dayMove;
+                monthDays.push(<div className={'round-calendar-day-line'}
+                                    style={{
+                                        transform: `rotate(${degStep}deg)`,
+                                        height: `${CALENDAR_RADIUS * 0.9}px`,
+                                        top: `${CALENDAR_RADIUS * 0.05}px`,
+                                        borderLeft: j % 2 === 0 ? '1px solid #aca89b' : '',
+                                    }}>
+                    <div className={`round-calendar-day-line__letter ${isOdd ? 'reversed' : ''}`} style={{
+                        width: (degToRad(360/365) * (CALENDAR_RADIUS/2 * 0.9)),
+                        transform: `rotate(${270}deg)`,
+                    }}>
+                        {j + 1}
+                    </div>
+                </div>)
+            }
+            days.push(monthDays);
+        }
+        return days;
+    }
 
     return (
         <div>
             <h1>Round Calendar</h1>
             <div className={'round-calendar-container'}>
-                <div className="round-calendar">
-                    <div className="round-calendar-gradient-bg"></div>
-                    {renderSvgBackground()}
-                    {renderMonthLetters()}
+                <div className={'round-calendar-container-content'}>
+                    <div className="round-calendar" style={{
+                        width: `${CALENDAR_RADIUS}px`,
+                        paddingBottom: `${CALENDAR_RADIUS}px`,
+                        transform: 'scale(1)',
+                    }}>
+                        <div className="round-calendar__gradient-bg"></div>
+                        {renderSvgBackground()}
+                        {renderMonthLetters()}
+                        {renderMonthDays()}
+                    </div>
                 </div>
             </div>
         </div>
