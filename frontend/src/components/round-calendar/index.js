@@ -6,7 +6,6 @@ import {
     LETTERS_OFFSET_DEG,
     MONTHS,
     MONTHS_COUNT,
-    TOTAL_DEG
 } from "./constants";
 import {degToRad, describeArc} from "./utils";
 import moment from "moment";
@@ -89,6 +88,17 @@ export const RoundCalendar = () => {
         </>
     }
 
+    const renderDayLines = () => {
+        return <path
+            d={`${describeArc(CALENDAR_RADIUS / 2, CALENDAR_RADIUS / 2, CALENDAR_RADIUS * 0.36, 0, DEG_PER_MONTH * (MONTHS_COUNT))}`}
+            fill="none"
+            stroke="red"
+            strokeDasharray={`1 3`}
+            strokeWidth="240"
+        />
+    }
+
+
     const renderSvgBackground = () => {
 
         const radius1 = CALENDAR_RADIUS * 0.4;
@@ -102,6 +112,7 @@ export const RoundCalendar = () => {
             {renderBlueLine(radius2)}
             {renderBlueLine(radius3)}
             {renderBlueLine(radius4)}
+            {renderDayLines()}
         </svg>;
     }
 
@@ -116,7 +127,6 @@ export const RoundCalendar = () => {
             const daysCount = moment().month( i ).daysInMonth();
             for (let j = 0; j < daysCount; j++) {
                 const degStep = (i) * DEG_PER_MONTH + ((j) * DEG_PER_MONTH / daysCount);
-                console.log((degToRad(360/365) * (CALENDAR_RADIUS/2 * 0.9)))
                 const dayDeg = degStep + j * (DEG_PER_MONTH / daysCount);
                 const dayMove = isOdd ? 0 : -15;
                 const dayRadius = move + dayMove;
@@ -125,7 +135,7 @@ export const RoundCalendar = () => {
                                         transform: `rotate(${degStep}deg)`,
                                         height: `${CALENDAR_RADIUS * 0.9}px`,
                                         top: `${CALENDAR_RADIUS * 0.05}px`,
-                                        borderLeft: j % 2 === 0 ? '1px solid #aca89b' : '',
+                                        // borderLeft: j % 2 === 0 ? '1px solid #aca89b' : '',
                                     }}>
                     <div className={`round-calendar-day-line__letter ${isOdd ? 'reversed' : ''}`} style={{
                         width: (degToRad(360/365) * (CALENDAR_RADIUS/2 * 0.9)),
